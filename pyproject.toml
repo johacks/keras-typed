@@ -43,6 +43,7 @@ dependencies = [
   "pytest-cov",
   "packaging",
   "dm_tree",
+  "jaxtyping",
   "coverage!=7.6.5"  # 7.6.5 breaks CI,
 ]
 
