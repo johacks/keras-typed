@@ -1,17 +1,15 @@
 import json
 import os
-from typing import Literal, Optional, Union
+from typing import Literal, Optional
 
 # Type definitions.
-KerasFloatXType = Union[
-    Literal["bfloat16"], Literal["float16"], Literal["float32"], Literal["float64"]
-]
-KerasImageDataFormat = Union[Literal["channels_first"], Literal["channels_last"]]
-KerasBackend = Union[Literal["tensorflow"], Literal["torch"], Literal["jax"]]
+KerasFloatxDType = Literal["bfloat16", "float16", "float32", "float64"]
+KerasImageDataFormat = Literal["channels_first", "channels_last"]
+KerasBackend = Literal["tensorflow", "torch", "jax"]
 
 
 # The type of float to use throughout a session.
-_FLOATX: KerasFloatXType = "float32"
+_FLOATX: KerasFloatxDType = "float32"
 
 # Epsilon fuzz factor used throughout the codebase.
 _EPSILON: float = 1e-7
@@ -23,7 +21,7 @@ _IMAGE_DATA_FORMAT: KerasImageDataFormat = "channels_last"
 _BACKEND: KerasBackend = "tensorflow"
 
 
-def floatx() -> Union[KerasFloatXType]:
+def floatx() -> KerasFloatxDType:
     """Return the default float type, as a string.
 
     E.g. `'bfloat16'`, `'float16'`, `'float32'`, `'float64'`.
@@ -39,7 +37,7 @@ def floatx() -> Union[KerasFloatXType]:
     return _FLOATX
 
 
-def set_floatx(value: KerasFloatXType) -> None:
+def set_floatx(value: KerasFloatxDType) -> None:
     """Set the default float dtype.
 
     Note: It is not recommended to set this to `"float16"` for training,
