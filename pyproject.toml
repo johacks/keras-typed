@@ -54,6 +54,8 @@ Source = "https://github.com/johacks/keras-typed"
 [tool.hatch.version]
 path = "src/tkeras/__about__.py"
 
+### ENVIRONMENTS ###
+
 # CPU environment.
 [tool.hatch.envs.default]
 installer = "uv"
@@ -115,12 +117,28 @@ jax-cuda = [
 UV_EXTRA_INDEX_URL = "https://download.pytorch.org/whl/cpu"
 UV_FIND_LINKS = "https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
 
+### TYPE CHECKING AND FORMATTING ###
+
 [tool.hatch.envs.types]
 extra-dependencies = [
   "mypy>=1.0.0",
 ]
 [tool.hatch.envs.types.scripts]
 check = "mypy --install-types --non-interactive {args:src/tkeras tests}"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+extend-select = ["I", "D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+### TESTING ###
 
 [tool.coverage.run]
 source_pkgs = ["tkeras", "tests"]
