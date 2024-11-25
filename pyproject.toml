@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "keras-typed"
+name = "tkeras"
 dynamic = ["version"]
 description = 'Keras with type annotations'
 readme = "README.md"
@@ -22,7 +22,29 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = []
+# Common dependencies.
+dependencies = [
+  "namex>=0.0.8",
+  "ruff",
+  "pytest",
+  "numpy",
+  "scipy",
+  "pandas",
+  "absl-py",
+  "requests",
+  "h5py",
+  "ml-dtypes",
+  "protobuf",
+  "google",
+  "tensorboard-plugin-profile",
+  "rich",
+  "build",
+  "optree",
+  "pytest-cov",
+  "packaging",
+  "dm_tree",
+  "coverage!=7.6.5"  # 7.6.5 breaks CI,
+]
 
 [project.urls]
 Documentation = "https://github.com/johacks/keras-typed#readme"
@@ -30,25 +52,86 @@ Issues = "https://github.com/johacks/keras-typed/issues"
 Source = "https://github.com/johacks/keras-typed"
 
 [tool.hatch.version]
-path = "src/keras_typed/__about__.py"
+path = "src/tkeras/__about__.py"
+
+# CPU environment.
+[tool.hatch.envs.default]
+installer = "uv"
+template = "default"
+extra-dependencies = [
+  "tensorflow-cpu~=2.18.0;sys_platform != 'darwin'",
+  "tensorflow~=2.18.0;sys_platform == 'darwin'",
+  "torch>=2.1.0",
+  "torchvision>=0.16.0",
+  "jax[cpu]",
+  "flax",
+]
+[tool.hatch.envs.default.env-vars]
+UV_EXTRA_INDEX_URL = "https://download.pytorch.org/whl/cpu"
+
+# Tensorflow GPU environment.
+[tool.hatch.envs.tensorflow-cuda]
+installer = "uv"
+extra-dependencies = [
+  "tensorflow[and-cuda]~=2.18.0",
+  # Torch CPU-only version (needed for testing).
+  "torch>=2.1.0",
+  "torchvision>=0.16.0",
+  # Jax CPU-only version (needed for testing).
+  "jax[cpu]",
+]
+[tool.hatch.envs.tensorflow-cuda.env-vars]
+UV_EXTRA_INDEX_URL = "https://download.pytorch.org/whl/cpu"
+
+# Torch GPU environment.
+[tool.hatch.envs.torch-cuda]
+installer = "uv"
+extra-dependencies = [
+  # Tensorflow CPU-only version (needed for testing).
+  "tensorflow-cpu~=2.18.0",
+  # Torch with CUDA support.
+  "torch==2.5.1+cu121",
+  "torchvision==0.20.1+cu121",
+  # Jax CPU-only version (needed for testing).
+  "jax[cpu]",
+]
+[tool.hatch.envs.torch-cuda.env-vars]
+UV_EXTRA_INDEX_URL = "https://download.pytorch.org/whl/cu121"
+
+# Jax GPU environment.
+[tool.hatch.envs.jax-cuda]
+installer = "uv"
+jax-cuda = [
+  # Tensorflow CPU-only version (needed for testing).
+  "tensorflow-cpu~=2.18.0",
+  # Torch CPU-only version (needed for testing).
+  "torch>=2.1.0",
+  "torchvision>=0.16.0",
+  # Jax with CUDA support.
+  "jax[cuda12]==0.4.28",
+  "flax"
+]
+[tool.hatch.envs.jax-cuda.env-vars]
+UV_EXTRA_INDEX_URL = "https://download.pytorch.org/whl/cpu"
+UV_FIND_LINKS = "https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
 
 [tool.hatch.envs.types]
 extra-dependencies = [
   "mypy>=1.0.0",
 ]
 [tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/keras_typed tests}"
+check = "mypy --install-types --non-interactive {args:src/tkeras tests}"
 
 [tool.coverage.run]
-source_pkgs = ["keras_typed", "tests"]
+source_pkgs = ["tkeras", "tests"]
 branch = true
 parallel = true
 omit = [
-  "src/keras_typed/__about__.py",
+  "src/tkeras/__about__.py",
 ]
 
 [tool.coverage.paths]
-keras_typed = ["src/keras_typed", "*/keras-typed/src/keras_typed"]
+tkeras = ["src/tkeras", "*/keras-typed/src/tkeras"]
 tests = ["tests", "*/keras-typed/tests"]
 
 [tool.coverage.report]
