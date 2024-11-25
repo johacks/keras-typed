@@ -66,7 +66,10 @@ def set_floatx(value: KerasFloatxDType) -> None:
     global _FLOATX
     accepted_dtypes = {"bfloat16", "float16", "float32", "float64"}
     if value not in accepted_dtypes:
-        raise ValueError(f"Unknown `floatx` value: {value}. " f"Expected one of {accepted_dtypes}")
+        raise ValueError(
+            f"Unknown `floatx` value: {value}. "
+            f"Expected one of {accepted_dtypes}"
+        )
     _FLOATX = str(value)
 
 
@@ -119,7 +122,9 @@ def image_data_format() -> KerasImageDataFormat:
     return _IMAGE_DATA_FORMAT
 
 
-def standardize_data_format(data_format: Optional[str] = None) -> KerasImageDataFormat:
+def standardize_data_format(
+    data_format: Optional[str] = None,
+) -> KerasImageDataFormat:
     if data_format is None:
         return image_data_format()
     data_format = str(data_format).lower()

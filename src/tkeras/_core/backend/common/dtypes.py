@@ -7,7 +7,9 @@ from tkeras._core.backend import config
 
 KerasBoolDType = Literal["bool"]
 BOOL_TYPES: tuple[KerasBoolDType, ...] = get_args(KerasBoolDType)
-KerasIntDType = Literal["uint8", "uint16", "uint32", "uint64", "int8", "int16", "int32", "int64"]
+KerasIntDType = Literal[
+    "uint8", "uint16", "uint32", "uint64", "int8", "int16", "int32", "int64"
+]
 INT_TYPES: tuple[KerasIntDType, ...] = get_args(KerasIntDType)
 KerasFloatDType = config.KerasFloatxDType
 FLOAT_TYPES: tuple[KerasFloatDType, ...] = get_args(KerasFloatDType)
@@ -57,14 +59,18 @@ PYTHON_DTYPES_MAP = {
 # https://github.com/google/jax/blob/main/jax/_src/dtypes.py
 
 
-@keras_export(["keras.utils.standardize_dtype", "keras.backend.standardize_dtype"])
+@keras_export(
+    ["keras.utils.standardize_dtype", "keras.backend.standardize_dtype"]
+)
 def standardize_dtype(dtype: Any) -> KerasAllowedDtype:
     if dtype is None:
         return config.floatx()
     dtype = PYTHON_DTYPES_MAP.get(dtype, dtype)
     if hasattr(dtype, "name"):
         dtype = dtype.name
-    elif hasattr(dtype, "__str__") and ("torch" in str(dtype) or "jax.numpy" in str(dtype)):
+    elif hasattr(dtype, "__str__") and (
+        "torch" in str(dtype) or "jax.numpy" in str(dtype)
+    ):
         dtype = str(dtype).split(".")[-1]
     elif hasattr(dtype, "__name__"):
         dtype = dtype.__name__
@@ -74,7 +80,9 @@ def standardize_dtype(dtype: Any) -> KerasAllowedDtype:
     return dtype
 
 
-def _type_promotion_lattice() -> dict[KerasAllowedDtype, list[KerasAllowedDtype]]:
+def _type_promotion_lattice() -> (
+    dict[KerasAllowedDtype, list[KerasAllowedDtype]]
+):
     """Return the type promotion lattice in the form of a DAG.
 
     This DAG maps each type to its immediately higher type on the lattice.
@@ -106,21 +114,29 @@ def _type_promotion_lattice() -> dict[KerasAllowedDtype, list[KerasAllowedDtype]
     return out
 
 
-def _make_lattice_upper_bounds() -> dict[KerasAllowedDtype, set[KerasAllowedDtype]]:
+def _make_lattice_upper_bounds() -> (
+    dict[KerasAllowedDtype, set[KerasAllowedDtype]]
+):
     lattice = _type_promotion_lattice()
     upper_bounds = {node: {node} for node in lattice}
     for n in lattice:
         while True:
-            new_upper_bounds = set().union(*(lattice[b] for b in upper_bounds[n]))
+            new_upper_bounds = set().union(
+                *(lattice[b] for b in upper_bounds[n])
+            )
             if n in new_upper_bounds:
-                raise ValueError(f"cycle detected in type promotion lattice for node {n}")
+                raise ValueError(
+                    f"cycle detected in type promotion lattice for node {n}"
+                )
             if new_upper_bounds.issubset(upper_bounds[n]):
                 break
             upper_bounds[n] |= new_upper_bounds
     return upper_bounds
 
 
-LATTICE_UPPER_BOUNDS: dict[KerasAllowedDtype, set[KerasAllowedDtype]] = _make_lattice_upper_bounds()
+LATTICE_UPPER_BOUNDS: dict[KerasAllowedDtype, set[KerasAllowedDtype]] = (
+    _make_lattice_upper_bounds()
+)
 
 
 @functools.lru_cache(512)
@@ -160,9 +176,13 @@ def _least_upper_bound(*nodes: KerasAllowedDtype) -> KerasAllowedDtype:
         bounds = [UB[n] for n in N]
     except KeyError:
         dtype = next(n for n in N if n not in UB)
-        raise ValueError(f"{dtype=} is not a valid dtype for Keras type promotion.")
+        raise ValueError(
+            f"{dtype=} is not a valid dtype for Keras type promotion."
+        )
     CUB: set[KerasAllowedDtype] = set.intersection(*bounds)
-    LUB: set[KerasAllowedDtype] = (CUB & N) or {c for c in CUB if CUB.issubset(UB[c])}
+    LUB: set[KerasAllowedDtype] = (CUB & N) or {
+        c for c in CUB if CUB.issubset(UB[c])
+    }
     if len(LUB) == 1:
         return LUB.pop()
     elif len(LUB) == 0:
@@ -217,7 +237,8 @@ def _respect_weak_type(
 
 @functools.lru_cache(maxsize=None)
 def _resolve_weak_type(
-    dtype: Union[KerasAllowedDtype, KerasWeakDType], precision: Literal["16", "32", "64"] = 32
+    dtype: Union[KerasAllowedDtype, KerasWeakDType],
+    precision: Literal["16", "32", "64"] = 32,
 ) -> KerasAllowedDtype:
     """Resolve weak type by the precision of `backend.floatx()`."""
     extended_allowed_dtypes = set(ALLOWED_DTYPES).union(WEAK_TYPES)
@@ -277,7 +298,9 @@ def _lattice_result_type(*args) -> KerasAllowedDtype:
         # strongly-typed counterparts and apply the weak type at the end. This
         # avoids returning the incorrect result with non-canonical weak types
         # (e.g. weak int16).
-        out_dtype = _least_upper_bound(*{_respect_weak_type(d, False) for d in dtypes})
+        out_dtype = _least_upper_bound(
+            *{_respect_weak_type(d, False) for d in dtypes}
+        )
         out_weak_type = True
     else:
         out_dtype = _least_upper_bound(

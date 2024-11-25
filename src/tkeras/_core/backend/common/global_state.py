@@ -14,7 +14,9 @@ def set_global_attribute(name: str, value: Any) -> None:
     setattr(GLOBAL_STATE_TRACKER, name, value)
 
 
-def get_global_attribute(name: str, default: Any = None, set_to_default: bool = False) -> Any:
+def get_global_attribute(
+    name: str, default: Any = None, set_to_default: bool = False
+) -> Any:
     attr = getattr(GLOBAL_STATE_TRACKER, name, None)
     if attr is None and default is not None:
         attr = default
