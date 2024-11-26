@@ -3,7 +3,7 @@ from typing import Any, Literal, Union, get_args
 
 from keras.src.api_export import keras_export
 
-from tkeras._core.backend import config
+from tkeras._api.backend import config
 
 KerasBoolDType = Literal["bool"]
 BOOL_TYPES: tuple[KerasBoolDType, ...] = get_args(KerasBoolDType)

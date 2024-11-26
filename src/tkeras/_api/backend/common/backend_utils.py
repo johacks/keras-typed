@@ -7,7 +7,7 @@ from typing import Literal, Optional, SupportsIndex, TypeVar, Union
 
 from jaxtyping import Array, Shaped
 
-from tkeras._core.backend.config import KerasImageDataFormat
+from tkeras._api.backend.config import KerasImageDataFormat
 
 # Type aliases
 T = TypeVar("T")

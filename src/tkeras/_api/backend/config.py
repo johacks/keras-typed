@@ -176,7 +176,7 @@ def enable_flash_attention() -> None:
     used. Typically, the inputs must be in `float16` or `bfloat16` dtype, and
     input layout requirements may vary depending on the backend.
     """
-    from tkeras._core.backend.common import global_state
+    from tkeras._api.backend.common import global_state
 
     global_state.set_global_attribute("flash_attention", None)
 
@@ -191,7 +191,7 @@ def disable_flash_attention() -> None:
     Once disabled, supported layers like `MultiHeadAttention` will not
     use flash attention for faster computations.
     """
-    from tkeras._core.backend.common import global_state
+    from tkeras._api.backend.common import global_state
 
     global_state.set_global_attribute("flash_attention", False)
 
@@ -212,7 +212,7 @@ def is_flash_attention_enabled() -> Optional[bool]:
     Returns:
         `False` if disabled; otherwise, it indicates that it is enabled.
     """
-    from tkeras._core.backend.common import global_state
+    from tkeras._api.backend.common import global_state
 
     return global_state.get_global_attribute("flash_attention", default=None)
 
